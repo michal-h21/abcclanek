@@ -2,11 +2,11 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[czech]{babel}
-\usepackage{listings}
+\usepackage{minted}
 \usepackage{hyperref}
 \usepackage[numberedsection=nolabel, toc]{glossaries}
 \makeglossary
-\newglossaryentry{tex4ht}{name=tex4ht, description={Konverzní nástroj pro převod \TeX ových dokumentů do jiných formátů, mimo jiné html nebo odt. \href{Homepage}{http://www.tug.org/applications/tex4ht/mn.html}}}
+\newglossaryentry{tex4ht}{name=TeX4ht, description={Konverzní nástroj pro převod \TeX ových dokumentů do jiných formátů, mimo jiné html nebo odt. \href{http://www.tug.org/applications/tex4ht/mn.html}{Homepage}}}
 \usepackage[style=authoryear, backend = biber,sortlocale=cs_CZ]{biblatex}
 \addbibresource{clanek.bib}
 	\printbibliography
@@ -22,15 +22,30 @@ Pod článkem se rozeběhla zajímavá debata nejen o nejlepším způsobu konve
 (La)\TeX u, ale také obecně o tom jestli má smysl psát dokumenty v \TeX u, nebo spíše v nělterém značkovacím jazyce, ať již je to některý dialekt xml, nebo třeba Markdown.
 
 Protože mám jisté zkušenosti s používáním \gls{tex4ht}%
-\footnote{Tvořím jednoduchý build systém \href{make4ht}{https://github.com/michal-h21/make4ht} 
-a od něj odvozený \href{tex4ebook}{https://github.com/michal-h21/tex4ebook} 
+\footnote{Tvořím jednoduchý build systém \href{https://github.com/michal-h21/make4ht}{make4ht} 
+a od něj odvozený \href{https://github.com/michal-h21/tex4ebook}{tex4ebook} 
 pro přímou konverzi \TeX u do formátů pro čtečky knih},
-rozhodl jsem se vytvořit krátký článek o jeho používání s češtinou a kódováním utf-8.
+rozhodl jsem se vytvořit krátký článek o jeho používání s češtinou a kódováním utf-8. V článku také ukážu použití některých balíčků, například \verb|biblatex|,
+\verb|glossaries|, nebo \verb|minted|.
+
+Zdrojové kódy tohoto článku jsou dostupné na \href{https://github.com/michal-h21/abcclanek}{Githubu}.
 
 \section{Proč TeX4ht?}
 
 \gls{tex4ht} se vyvíjí od druhé poloviny 90. let, v podstatě jako dílo 
-jediného autora, Eitana Gurariho
+jediného autora, Eitana Gurariho. Tento autor bohužel před několika lety zemřel
+a v současnosti patrně není nikdo, kdo by se v kódu plně orientoval a vývoj poněkud stagnuje. 
+
+Na druhou stranu, v současnosti je nejlepším konvertorem z 
+\LaTeX u a poskytuje funkční infrastrukturu pro konfigurací libovolných maker.
+
+\section{Čeština}
+
+Mejme hypotetický článek pro Xe\LaTeX, který se budeme snažit přeložit s \gls{tex4ht}:
+
+\inputminted{latex}{priklady/priklad1.tex}
+
+
 
 \printglossary
 \printbibliography
