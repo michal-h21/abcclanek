@@ -1,0 +1,11 @@
+Make:add("biber","biber ${input}")
+Make:add("glossaries","makeglossaries ${input}")
+if mode=="draft" then 
+  Make:htlatex{}
+else
+  Make:htlatex{}
+  Make:biber{}
+  Make:glossaries{}
+  Make:htlatex{}
+  Make:htlatex{}
+end
