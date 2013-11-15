@@ -2,14 +2,27 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[czech]{babel}
+\usepackage{csquotes}
+\DeclareQuoteStyle{czech}
+  {\quotedblbase}
+	{\textquotedblleft}
+	{\textquoteleft}
+	{\textquoteright}
+\AtBeginDocument{\shorthandoff{-"}}
 \usepackage{minted}
+\usepackage[style=authoryear, backend = biber,sortlocale=cs_CZ]{biblatex}
 \usepackage{hyperref}
 \usepackage[numberedsection=nolabel, toc]{glossaries}
 \makeglossary
 \newglossaryentry{tex4ht}{name=TeX4ht, description={Konverzní nástroj pro převod \TeX ových dokumentů do jiných formátů, mimo jiné html nebo odt. \href{http://www.tug.org/applications/tex4ht/mn.html}{Homepage}}}
-\usepackage[style=authoryear, backend = biber,sortlocale=cs_CZ]{biblatex}
+\newglossaryentry{s4ht}{name={Soubory .4ht},text={.4ht}, description={Konfigurační soubory pro LaTeXové balíčky}}
+\newglossaryentry{tex4ht-post}{name=tex4ht, 
+	description={Postprocesor, který převádí dvi soubor na výstupní xml soubory}}
+\newglossaryentry{t4ht}{name=t4ht,
+	description={Další postprocesor, který na základě instrukcí předaných tex4ht vytváří CSS soubory a případně provádí konverzi obrázků.}}
+%\newglossaryentry{s4ht}{name={Soubory 4ht}, description={Soubory s konfiguracemi balíčků pro TeX4ht}}
+
 \addbibresource{clanek.bib}
-	\printbibliography
 \begin{document}
 \title{Pracujeme s TeX4ht}
 \author{Michal Hoftich}
@@ -34,10 +47,25 @@ Zdrojové kódy tohoto článku jsou dostupné na \href{https://github.com/micha
 
 \gls{tex4ht} se vyvíjí od druhé poloviny 90. let, v podstatě jako dílo 
 jediného autora, Eitana Gurariho. Tento autor bohužel před několika lety zemřel
-a v současnosti patrně není nikdo, kdo by se v kódu plně orientoval a vývoj poněkud stagnuje. 
+a v současnosti patrně není nikdo, kdo by se v kódu plně orientoval 
+a vývoj mírně řečeno stagnuje. 
 
 Na druhou stranu, v současnosti je nejlepším konvertorem z 
-\LaTeX u a poskytuje funkční infrastrukturu pro konfigurací libovolných maker.
+\LaTeX u a poskytuje funkční infrastrukturu pro konfigurací libovolných maker. 
+V současnosti je na tvůrcích balíčků nebo jejich uživatelích, aby poskytovali 
+tyto konfigurace, není v reálných silách současných správců, aby tvořili konfigurace pro všechny balíčky.
+
+\subsection{Na co konfigurace?}
+
+Bez konfigurací bychom nezískali logické značkování, postprocesor \gls{tex4ht-post} sice vytvoří výstupní soubory, ale ty by obsahovaly jen vizuální formátování získané z dvi souboru, bez jakékoliv logické struktury
+(nadpisy, seznamy, odkazy).
+
+Proto \gls{tex4ht} obsahuje mechanismus \gls{s4ht} souborů, které jsou 
+automaticky nahrávané spolu s balíčkem téhož jména a kde jsou umístěné 
+redefinice některých maker, aby bylo možné je konfigurovat. Více informací 
+v sekci \ref{sec:config}
+
+\section{Proč }
 
 \section{Čeština}
 
@@ -45,7 +73,28 @@ Mejme hypotetický článek pro Xe\LaTeX, který se budeme snažit přeložit s 
 
 \inputminted{latex}{priklady/priklad1.tex}
 
+\gls{tex4ht} obsahuje množství skriptů pro překlad dokumentů. Nejběžnější 
+je \verb|htlatex|, který překládá dokument čístým \LaTeX em. Protože máš 
+dokument je určený pro Xe\LaTeX, můžeme zkusit variantu tohoto skriptu,
+\verb|htxelatex|. 
 
+\begin{minted}{bash}
+htxelatex priklad1
+\end{minted}
+
+Kompilace se zastaví s chybovou hláškou
+
+\begin{verbatim}
+	! LaTeX Error: Command `\acute' already defined in `'.
+\end{verbatim}
+
+To nám naznačuje, že něco není v pořádku. Podobných hlášek se objeví více,
+můžete zmáčkout klávesu \verb|r| a \verb|enter| pro pokračování kompilace bez 
+přerušení. Kompilační skripty překládají dokument \(3 \times\). 
+Je to kvůli správnému fungování odkazů, \gls{tex4ht} ukládá při každém průchodu
+informace o odkazech do pomocných souorů, tento mechanismus funguje
+podobně jako \verb|\label - \ref| mechanismus v \LaTeX u.
+\section{Konfigurace balíčků}\label{sec:config}
 
 \printglossary
 \printbibliography
