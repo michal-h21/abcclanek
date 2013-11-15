@@ -1,3 +1,5 @@
+local filter = require "make4ht-filter"
+local process = filter{"cleanspan", "fixligatures", "hruletohr"}
 Make:add("biber","biber ${input}")
 Make:add("glossaries","makeglossaries ${input}")
 if mode=="draft" then 
@@ -9,3 +11,4 @@ else
   Make:htlatex{}
   Make:htlatex{}
 end
+--Make:match("html$",process)

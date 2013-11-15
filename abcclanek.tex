@@ -18,6 +18,7 @@
 \newglossaryentry{s4ht}{name={Soubory .4ht},text={.4ht}, description={Konfigurační soubory pro LaTeXové balíčky}}
 \newglossaryentry{tex4ht-post}{name=tex4ht, 
 	description={Postprocesor, který převádí dvi soubor na výstupní xml soubory}}
+\newglossaryentry{dvi}{name=dvi,description={}}
 \newglossaryentry{t4ht}{name=t4ht,
 	description={Další postprocesor, který na základě instrukcí předaných tex4ht vytváří CSS soubory a případně provádí konverzi obrázků.}}
 %\newglossaryentry{s4ht}{name={Soubory 4ht}, description={Soubory s konfiguracemi balíčků pro TeX4ht}}
@@ -92,8 +93,28 @@ To nám naznačuje, že něco není v pořádku. Podobných hlášek se objeví 
 můžete zmáčkout klávesu \verb|r| a \verb|enter| pro pokračování kompilace bez 
 přerušení. Kompilační skripty překládají dokument \(3 \times\). 
 Je to kvůli správnému fungování odkazů, \gls{tex4ht} ukládá při každém průchodu
-informace o odkazech do pomocných souorů, tento mechanismus funguje
-podobně jako \verb|\label - \ref| mechanismus v \LaTeX u.
+informace o odkazech do pomocných souborů, tento mechanismus funguje
+podobně jako \verb|\label - \ref| mechanismus v \LaTeX{}u.
+
+Po třech průchodech \LaTeX em přichází zpracování výstupního \gls{dvi} 
+souboru postprocesorem \gls{tex4ht-post}. Zde vidíme další chybovou hlášku:
+
+\begin{verbatim}
+(--- xdv font = [/home/mint/.fonts/LinLibertine_R.otf] (not implemented) ---)
+--- warning --- Couldn't find font `[/home/mint/.fonts/LinLibertine_R.otf].ht
+\end{verbatim}
+
+Naneštěstí, chyba v postprocesoru \gls{tex4ht-post} znemožňuje použití opentype fontů, pokud si otevřete výsledný html soubor \verb|priklad1.html|, neobjeví se žádný text. Chybové hlášky při překladu \LaTeX em byly 
+způsobené balíčkem \verb|fontspec|.  Jak řešit tuto situaci? Máme v zásadě dvě možnosti:
+
+\begin{enumerate}
+	\item Upravit náš dokument tak, aby nepoužíval fontspec a opentype fonty
+		při běhu \gls{tex4ht}
+	\item Použít \href{https://github.com/michal-h21/fontspec}{experimentální verzi} 
+		balíčku \verb|fontspec|. 
+		\href{http://michal-h21.github.io/fontspec/fontspec-4ht.html}%
+		{Ukázkový dokument}.
+\end{enumerate}
 \section{Konfigurace balíčků}\label{sec:config}
 
 \printglossary
