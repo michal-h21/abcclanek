@@ -2,6 +2,9 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[czech]{babel}
+\usepackage{newunicodechar}
+\newunicodechar{ﬁ}{fi}
+\newunicodechar{ﬃ}{ffi}
 \usepackage{csquotes}
 \DeclareQuoteStyle{czech}
   {\quotedblbase}
@@ -19,6 +22,7 @@
 \newglossaryentry{tex4ht-post}{name=tex4ht, 
 	description={Postprocesor, který převádí dvi soubor na výstupní xml soubory}}
 \newglossaryentry{dvi}{name=dvi,description={}}
+\newglossaryentry{xml}{name=XML, description={}}
 \newglossaryentry{t4ht}{name=t4ht,
 	description={Další postprocesor, který na základě instrukcí předaných tex4ht vytváří CSS soubory a případně provádí konverzi obrázků.}}
 %\newglossaryentry{s4ht}{name={Soubory 4ht}, description={Soubory s konfiguracemi balíčků pro TeX4ht}}
@@ -115,7 +119,106 @@ způsobené balíčkem \verb|fontspec|.  Jak řešit tuto situaci? Máme v zása
 		\href{http://michal-h21.github.io/fontspec/fontspec-4ht.html}%
 		{Ukázkový dokument}.
 \end{enumerate}
+
+Druhá možnost  je lehce experimentální, ukážeme si tedy první. 
+
+\gls{tex4ht} se snaží, jak je to jenom možné, aby autor nemusel upravovat 
+zdrojové kódy dokumentů. Někdy je to ale jediná možnost, jak zabránit načtení
+balíčků, které zprůsobují problémy při kompilaci s \gls{tex4ht}.
+
+Pro zjištění, jestli je dokument kompilován s \gls{tex4ht}, můžeme použít 
+konstrukci:
+\begin{minted}{latex}
+\ifdefined\HCode
+   Kod urceny pro TeX4ht
+\else
+   Kod urceny pro prevod do PDF
+\fi
+\end{minted}
+
+Makro \verb|\HCode| je definováno \gls{tex4ht} a slouží k vkládání \gls{xml} 
+kódů do dokumentu. 
+
+Nyní náš dokument vypadá takto:
+
+\inputminted{latex}{priklady/priklad2.tex}
+
+Místo \verb|htxelatexu| nyní můžeme použít obyčejný \verb|htlatex|,
+protože dokument neobsahuje žádná makra vyžadující ke svému běhu Xe\TeX.
+
+\begin{verbatim}
+  htlatex priklad2
+\end{verbatim}
+
+Text výsledného dokumentu vypadá takto:
+
+%\inputminted[firstline=17, lastline=23]{html}{priklady/priklad2.html}
+
+\begin{verbatim}
+P&#x0159;íli&#353; &#382;lutou&#x010D;k&#x00FD; k&#x016F;&#x0148; úp&#x011B;l 
+<span class="ecti-1000">&#x010F;</span><span 
+class="ecti-1000">ábelsk</span><span 
+class="ecti-1000">é </span><span 
+class="ecti-1000">ódy</span>. Vyzkou&#353;íme si také ligatury: grafika,
+finance, ffi.
+\end{verbatim}
+
+Jak je vidět, není výsledek úplně hezký, některé akcentované znaky byly
+nahrazené \verb|html| entitami, ostatní jsou v kódování latin-2.
+
+\gls{tex4ht} umí dokument uložit v kódování utf-8, jen je třeba přidat několik
+parametrů:
+
+\begin{verbatim}
+	htlatex priklad2 "xhtml, charset=utf-8" " -cunihtf -utf8"
+\end{verbatim}
+
+Tento ošklivý příkaz se skládá ze tří částí:
+
+\begin{description}
+	\item[priklad2] Název souboru
+	\item["xhtml, charset=utf-8"] parametry pro baliček \gls{tex4ht}. 
+		První parametr označuje document type dokumentu, nebo konfigurační soubor 
+		(o těch si povíme více později), 
+		\verb|charset=utf-8| určuje, jaké kódování bude uvedenév html souboru. 
+	 Tato volba ovšem nezaručuje, že soubor v kódování utf8 skutečně bude!
+
+	 Kompletní seznam možných parametrů je možné najít na 
+	 \href{http://www.cvr.cc/?p=504}{blogu CV Radhakrishnana}.
+ \item[" -cunihtf -utf8"] parametry pro program \gls{tex4ht-post},
+    určují, že bude výsledný soubor uložen v kódování utf8. Všimněte si mezery
+    za uvozovkou, musí tam být.
+\end{description}		
+
+Text nyní vypadá takto:
+
+\begin{verbatim}
+	Příliš žluťoučký kůň úpěl <span 
+	class="ecti-1000">ď</span><span 
+	class="ecti-1000">ábelsk</span><span 
+	class="ecti-1000">é </span><span 
+	class="ecti-1000">ódy</span>. Vyzkoušíme si také ligatury: graﬁka,
+	ﬁnance, ﬃ.
+\end{verbatim}
+
+Tím jsme vyřešili problém s kódováním znaků, ale stále jsou tu další problémy.
+Některá slova jsou rozdělená mezi několik elementů \verb|<span>| a text 
+obsahuje ligatury\footnote{To z technických důvodů není ve výpisu vidět, 
+	ale můžete se podívat sami: \href{priklady/priklad2.html}{priklad2.html}}.
+
+Tyto dva problémy nění snadné vyřešit čistě jenom v prostředí \gls{tex4ht},
+což byl jeden z důvodů, proč jsem vytvořil \href{https://github.com/michal-h21/make4ht}{make4ht}. S pomocí tohoto nástroje můžete jednak zjednodušit 
+předávání argumentů \verb|htlatexu|, a můžete využít různé filtry, které 
+umožňují vyčistit vygenerované soubory od nadbytečných elementů \verb|<span>|
+nebo ligatur. 
+
+Vytvoříme si \verb|make| soubor, se stejnym názvem jako \TeX ový dokument, 
+jenom s příponou \verb|.mk4|. V našem případě \verb|priklad3.mk4|:
+
+
+
 \section{Konfigurace balíčků}\label{sec:config}
+
 
 \printglossary
 \printbibliography
