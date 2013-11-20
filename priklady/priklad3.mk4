@@ -1,0 +1,3 @@
+local filter= require "make4ht-filter"
+local process = filter{"cleanspan", "fixligatures"}
+Make:match("html$",process)
