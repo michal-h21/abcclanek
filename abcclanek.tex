@@ -22,6 +22,7 @@
 \newglossaryentry{tex4ht-post}{name=tex4ht, 
 	description={Postprocesor, který převádí dvi soubor na výstupní xml soubory}}
 \newglossaryentry{dvi}{name=dvi,description={}}
+\newglossaryentry{make4ht}{name=make4ht,description={}}
 \newglossaryentry{xml}{name=XML, description={}}
 \newglossaryentry{t4ht}{name=t4ht,
 	description={Další postprocesor, který na základě instrukcí předaných tex4ht vytváří CSS soubory a případně provádí konverzi obrázků.}}
@@ -37,12 +38,12 @@
 V \href{http://www.abclinuxu.cz/clanky/tex-5-priklad-makra-pro-generovani-html}{článku na Abclinuxu.cz} 
 pan \textcite{Olsak13}  popisuje konverzi \TeX ového souboru na html. 
 Pod článkem se rozeběhla zajímavá debata nejen o nejlepším způsobu konverze
-(La)\TeX u, ale také obecně o tom jestli má smysl psát dokumenty v \TeX u, nebo spíše v nělterém značkovacím jazyce, ať již je to některý dialekt xml, nebo třeba Markdown.
+(La)\TeX{}u, ale také obecně o tom jestli má smysl psát dokumenty v \TeX{}u, nebo spíše v nělterém značkovacím jazyce, ať již je to některý dialekt xml, nebo třeba Markdown.
 
 Protože mám jisté zkušenosti s používáním \gls{tex4ht}%
 \footnote{Tvořím jednoduchý build systém \href{https://github.com/michal-h21/make4ht}{make4ht} 
 a od něj odvozený \href{https://github.com/michal-h21/tex4ebook}{tex4ebook} 
-pro přímou konverzi \TeX u do formátů pro čtečky knih},
+pro přímou konverzi TeXu do formátů pro čtečky e-booků},
 rozhodl jsem se vytvořit krátký článek o jeho používání s češtinou a kódováním utf-8. V článku také ukážu použití některých balíčků, například \verb|biblatex|,
 \verb|glossaries|, nebo \verb|minted|.
 
@@ -212,10 +213,33 @@ předávání argumentů \verb|htlatexu|, a můžete využít různé filtry, kt
 umožňují vyčistit vygenerované soubory od nadbytečných elementů \verb|<span>|
 nebo ligatur. 
 
-Vytvoříme si \verb|make| soubor, se stejnym názvem jako \TeX ový dokument, 
+Vytvoříme si \verb|make| soubor, se stejným názvem jako \TeX ový dokument, 
 jenom s příponou \verb|.mk4|. V našem případě \verb|priklad3.mk4|:
 
+\inputminted{lua}{priklady/priklad3.mk4}
 
+V tomto případě využíváme pouze filtry. Build soubory pro \gls{make4ht} jsou 
+skripty v jazyce LUA, takže můžeme využít standardních funkcí jako je 
+\verb|require| pro nahrání knihovny \verb|make4ht-filter|. Tato knihovna
+vrací funkci, která vytváří další filtrovací funkce. V našem případě 
+vytváříme filtrovací funkci \verb|process|, která obsahuje dva filtry -- 
+\verb|cleanspan| pro sloučení nadbytečných elementů \verb|<span>| a 
+\verb|fixligatures| pro rozdělení ligatur. S pomocí funkce \verb|Make:match|
+pak aplikujeme tuto filtrovací funkci na všechny vygenerované soubory s příponou \verb|html|. Další dostupné filtry a funkce \gls{make4ht} jsou popsané
+na \href{https://github.com/michal-h21/make4ht}{stránkách projektu}.
+
+
+
+
+Překlad dokumentu je podstatně jednodušší:
+
+\begin{verbatim}
+make4ht -u priklad3
+\end{verbatim}
+
+A výsledek:
+
+\inputminted[firstline=17, lastline=19]{html}{priklady/priklad3.html}
 
 \section{Konfigurace balíčků}\label{sec:config}
 

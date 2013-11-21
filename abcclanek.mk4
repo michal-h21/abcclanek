@@ -11,4 +11,4 @@ else
   Make:htlatex{}
   Make:htlatex{}
 end
---Make:match("html$",process)
+Make:match("html$",process)
